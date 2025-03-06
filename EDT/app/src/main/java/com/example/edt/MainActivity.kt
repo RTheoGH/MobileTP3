@@ -39,6 +39,9 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
         enableEdgeToEdge()
         setContent {
             EDTTheme {
@@ -98,8 +101,8 @@ fun App(){
     ){ innerPadding ->
         when (screen){
             0 -> { Accueil(innerPadding) }
-            1 -> {}
-            2 -> {}
+            1 -> { Planning(innerPadding) }
+            2 -> { Compte(innerPadding) }
         }
     }
 }
