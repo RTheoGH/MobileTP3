@@ -20,6 +20,6 @@ interface CompteDAO {
     @Query("SELECT * FROM compte_table")
     fun getAllUsers(): List<Compte>
 
-    @Query("SELECT * FROM compte_table WHERE id = :userId")
-    fun getUserById(userId: Int): Compte?
+    @Query("SELECT * FROM compte_table WHERE login = :userLogin")
+    fun getUserByLogin(userLogin: Int): Compte?
 }
