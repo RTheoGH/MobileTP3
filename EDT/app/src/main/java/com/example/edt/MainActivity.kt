@@ -54,6 +54,8 @@ fun App(){
     var titre by remember { mutableStateOf("Accueil") }
     var screen by remember { mutableIntStateOf(0) }
 
+    var nom by remember { mutableStateOf("") }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -98,8 +100,14 @@ fun App(){
     ){ innerPadding ->
         when (screen){
             0 -> { Accueil(innerPadding) }
-            1 -> { Planning(innerPadding) }
-            2 -> { Compte(innerPadding) }
+            1 -> { Planning(innerPadding,nom) }
+            2 -> {
+                Compte(innerPadding, onConnexionSuccess = {
+                    nom = it
+                    titre="Planning"
+                    screen=1
+                })
+            }
         }
     }
 }
