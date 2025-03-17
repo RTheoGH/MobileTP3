@@ -14,5 +14,6 @@ data class Compte(
     @ColumnInfo(name = "date_naissance") val dateNaissance: String,
     @ColumnInfo(name = "telephone") val telephone: String,
     @ColumnInfo(name = "mail") val mail: String,
-    @ColumnInfo(name = "interets") val interets: String
+    @ColumnInfo(name = "interets") val interets: String,
+    @ColumnInfo(name = "a") val planning: List<Evenement>
 )

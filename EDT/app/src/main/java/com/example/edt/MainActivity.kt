@@ -55,6 +55,7 @@ fun App(){
     var screen by remember { mutableIntStateOf(0) }
 
     var nom by remember { mutableStateOf("") }
+    var user by remember{ mutableStateOf<Compte?>(null) }
 
     Scaffold(
         topBar = {
@@ -90,7 +91,7 @@ fun App(){
                     icon = {Icon(Icons.Rounded.AccountBox, contentDescription = null)},
                     label = {Text("Compte")},
                     onClick = {
-                        titre = "Compte"
+                        titre = if(user == null) "Compte" else "Profil"
                         screen = 2
                     },
                     selected = screen == 2
@@ -99,13 +100,16 @@ fun App(){
         },
     ){ innerPadding ->
         when (screen){
-            0 -> { Accueil(innerPadding) }
-            1 -> { Planning(innerPadding,nom) }
+            0 -> { Accueil(innerPadding,user) }
+            1 -> { Planning(innerPadding,user) }
             2 -> {
-                Compte(innerPadding, onConnexionSuccess = {
-                    nom = it
+                Compte(innerPadding,user,onConnexionSuccess = {
+                    user = it
                     titre="Planning"
                     screen=1
+                }, onSeDeconnecter = {
+                    user = null
+                    titre="Compte"
                 })
             }
         }

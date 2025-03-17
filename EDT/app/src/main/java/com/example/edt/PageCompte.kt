@@ -38,17 +38,20 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun Compte(pad : PaddingValues,onConnexionSuccess: (String) -> Unit) {
+fun Compte(pad : PaddingValues,user: Compte?,onConnexionSuccess: (Compte) -> Unit,onSeDeconnecter: () -> Unit) {
     var showMenuCompte by remember { mutableStateOf(true) }
     var showInscription by remember { mutableStateOf(false) }
     var showConnexion by remember { mutableStateOf(false) }
     var logInscrit by remember { mutableStateOf<String?>(null) }
-    var logConnecte by remember { mutableStateOf<String?>(null) }
+    var logConnecte by remember { mutableStateOf<Compte?>(null) }
     //var showCompte by remember { mutableStateOf<Compte?>(null) }
 
     when{
+        user != null -> {
+            Profil(pad,user,onSeDeconnecter)
+        }
         logInscrit != null -> {
-            Profil(pad, logInscrit!!){
+            Recap(pad, logInscrit!!){
                 showConnexion = true
                 logInscrit = null
             }
@@ -268,13 +271,13 @@ fun Inscription(pad : PaddingValues,onCompteAdded: (Compte) -> Unit){
             },
             enabled = loginError == null && mdpError == null
         ) {
-            Text(text="S'inscrire'")
+            Text(text="S'inscrire")
         }
     }
 }
 
 @Composable
-fun Connexion(pad : PaddingValues, onConnexionSuccess: (String) -> Unit){
+fun Connexion(pad : PaddingValues, onConnexionSuccess: (Compte) -> Unit){
     val ctx = LocalContext.current
     val database = AppDatabase.getDatabase(ctx)
     val compteDao = database.compteDao()
@@ -324,7 +327,7 @@ fun Connexion(pad : PaddingValues, onConnexionSuccess: (String) -> Unit){
                     } else {
                         withContext(Dispatchers.Main){
                             connexionError = null
-                            onConnexionSuccess(existingCompte.login)
+                            onConnexionSuccess(existingCompte)
                         }
                     }
                 }
@@ -336,7 +339,7 @@ fun Connexion(pad : PaddingValues, onConnexionSuccess: (String) -> Unit){
 }
 
 @Composable
-fun Profil(pad: PaddingValues, login: String, onSeConnecter: () -> Unit) {
+fun Recap(pad: PaddingValues, login: String, onSeConnecter: () -> Unit) {
     val ctx = LocalContext.current
     val database = AppDatabase.getDatabase(ctx)
     val compteDao = database.compteDao()
@@ -370,4 +373,40 @@ fun Profil(pad: PaddingValues, login: String, onSeConnecter: () -> Unit) {
         }
     }
 
+}
+
+@Composable
+fun Profil(pad: PaddingValues,user: Compte, onSeDeconnecter: () -> Unit){
+    val ctx = LocalContext.current
+    val database = AppDatabase.getDatabase(ctx)
+    val compteDao = database.compteDao()
+
+    var compte by remember { mutableStateOf<Compte?>(null) }
+    val coroutine = rememberCoroutineScope()
+
+    LaunchedEffect(user.login) {
+        coroutine.launch {
+            compte = compteDao.getCompteByLogin(user.login)
+        }
+    }
+
+    Column(modifier = Modifier.padding(pad).padding(16.dp)) {
+        if (compte != null) {
+            Text(text = "Login: ${compte!!.login}")
+            Text(text = "Nom: ${compte!!.nom}")
+            Text(text = "Prénom: ${compte!!.prenom}")
+            Text(text = "Date de naissance: ${compte!!.dateNaissance}")
+            Text(text = "Téléphone: ${compte!!.telephone}")
+            Text(text = "Mail: ${compte!!.mail}")
+            Text(text = "Intérêts: ${compte!!.interets}")
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = { onSeDeconnecter() }
+            ) {
+                Text(text = "Se deconnecter")
+            }
+        } else {
+            Text(text = "Chargement des informations...", fontSize = 14.sp)
+        }
+    }
 }

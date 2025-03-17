@@ -12,13 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Accueil(pad : PaddingValues){
+fun Accueil(pad : PaddingValues,user : Compte?){
     Column(
         modifier = Modifier.fillMaxSize().padding(pad).padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("Bienvenue !")
+        if(user == null) Text("Bienvenue !")
+        else Text("Bienvenue, ${user.login} !")
     }
 
 }
