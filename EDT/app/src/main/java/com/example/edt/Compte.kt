@@ -15,5 +15,8 @@ data class Compte(
     @ColumnInfo(name = "telephone") val telephone: String,
     @ColumnInfo(name = "mail") val mail: String,
     @ColumnInfo(name = "interets") val interets: String,
-    @ColumnInfo(name = "a") val planning: List<Evenement>
+    @ColumnInfo(name = "e1") val evenement1: String,
+    @ColumnInfo(name = "e2") val evenement2: String,
+    @ColumnInfo(name = "e3") val evenement3: String,
+    @ColumnInfo(name = "e4") val evenement4: String
 )

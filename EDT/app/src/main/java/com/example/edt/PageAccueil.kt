@@ -21,5 +21,4 @@ fun Accueil(pad : PaddingValues,user : Compte?){
         if(user == null) Text("Bienvenue !")
         else Text("Bienvenue, ${user.login} !")
     }
-
 }

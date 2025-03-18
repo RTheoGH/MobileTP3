@@ -1,6 +1,5 @@
 package com.example.edt
 
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -44,7 +43,6 @@ fun Compte(pad : PaddingValues,user: Compte?,onConnexionSuccess: (Compte) -> Uni
     var showConnexion by remember { mutableStateOf(false) }
     var logInscrit by remember { mutableStateOf<String?>(null) }
     var logConnecte by remember { mutableStateOf<Compte?>(null) }
-    //var showCompte by remember { mutableStateOf<Compte?>(null) }
 
     when{
         user != null -> {
@@ -107,7 +105,6 @@ fun Compte(pad : PaddingValues,user: Compte?,onConnexionSuccess: (Compte) -> Uni
         }
     }
 }
-
 
 @Composable
 fun Inscription(pad : PaddingValues,onCompteAdded: (Compte) -> Unit){
@@ -262,7 +259,8 @@ fun Inscription(pad : PaddingValues,onCompteAdded: (Compte) -> Unit){
                                 if (isOption1Checked) "Sport" else null,
                                 if (isOption2Checked) "Musique" else null,
                                 if (isOption3Checked) "Lecture" else null
-                            ).joinToString(", ")
+                            ).joinToString(", "),
+                            evenement1 = "vide", evenement2 = "vide", evenement3 = "vide", evenement4 = "vide"
                         )
                         compteDao.insert(compte)
                         onCompteAdded(compte)
@@ -372,7 +370,6 @@ fun Recap(pad: PaddingValues, login: String, onSeConnecter: () -> Unit) {
             Text(text = "Chargement des informations...", fontSize = 14.sp)
         }
     }
-
 }
 
 @Composable
