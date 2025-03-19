@@ -1,5 +1,7 @@
 package com.example.edt
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,8 +11,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -26,10 +30,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
@@ -119,6 +127,7 @@ fun Inscription(pad : PaddingValues,onCompteAdded: (Compte) -> Unit){
     var dateNaissance by remember { mutableStateOf("") }
     var telephone by remember { mutableStateOf("") }
     var mail by remember { mutableStateOf("") }
+    var mailValide by remember { mutableStateOf(true) }
 
     var isOption1Checked by remember { mutableStateOf(false) }
     var isOption2Checked by remember { mutableStateOf(false) }
@@ -198,8 +207,11 @@ fun Inscription(pad : PaddingValues,onCompteAdded: (Compte) -> Unit){
             },
             value = dateNaissance,
             onValueChange = {
-                dateNaissance = it
+                if(it.length <= 8 && it.all { char -> char.isDigit() }){
+                    dateNaissance = it
+                }
             },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
@@ -208,8 +220,11 @@ fun Inscription(pad : PaddingValues,onCompteAdded: (Compte) -> Unit){
             },
             value = telephone,
             onValueChange = {
-                telephone = it
+                if(it.length <= 10 && it.all { char -> char.isDigit() }) {
+                    telephone = it
+                }
             },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
@@ -219,9 +234,15 @@ fun Inscription(pad : PaddingValues,onCompteAdded: (Compte) -> Unit){
             value = mail,
             onValueChange = {
                 mail = it
+                mailValide = android.util.Patterns.EMAIL_ADDRESS.matcher(it).matches()
             },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            isError = !mailValide,
             modifier = Modifier.fillMaxWidth()
         )
+        if (!mailValide && mail.isNotEmpty()) {
+            Text(text = "Adresse mail invalide",color = Color.Red,fontSize = 12.sp)
+        }
         Row(verticalAlignment = Alignment.CenterVertically){
             Checkbox(
                 checked = isOption1Checked,
@@ -252,7 +273,7 @@ fun Inscription(pad : PaddingValues,onCompteAdded: (Compte) -> Unit){
                             mdp = mdp,
                             nom = nom,
                             prenom = prenom,
-                            dateNaissance = dateNaissance,
+                            dateNaissance = FormatDate(dateNaissance),
                             telephone = telephone,
                             mail = mail,
                             interets = listOfNotNull(
@@ -353,7 +374,10 @@ fun Recap(pad: PaddingValues, login: String, onSeConnecter: () -> Unit) {
 
     Column(modifier = Modifier.padding(pad).padding(16.dp)) {
         if (compte != null) {
+            Text(text = "Récapitulatif :", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
             Text(text = "Login: ${compte!!.login}")
+            Text(text = "Mot de passe: *******")
             Text(text = "Nom: ${compte!!.nom}")
             Text(text = "Prénom: ${compte!!.prenom}")
             Text(text = "Date de naissance: ${compte!!.dateNaissance}")
@@ -387,16 +411,42 @@ fun Profil(pad: PaddingValues,user: Compte, onSeDeconnecter: () -> Unit){
         }
     }
 
-    Column(modifier = Modifier.padding(pad).padding(16.dp)) {
+    Column(
+        modifier = Modifier.padding(pad).padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         if (compte != null) {
-            Text(text = "Login: ${compte!!.login}")
-            Text(text = "Nom: ${compte!!.nom}")
-            Text(text = "Prénom: ${compte!!.prenom}")
-            Text(text = "Date de naissance: ${compte!!.dateNaissance}")
-            Text(text = "Téléphone: ${compte!!.telephone}")
-            Text(text = "Mail: ${compte!!.mail}")
-            Text(text = "Intérêts: ${compte!!.interets}")
+            Text(
+                text = compte!!.login,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(modifier = Modifier.height(8.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.user),
+                contentDescription = "Photo de profil",
+                modifier = Modifier.size(80.dp).clip(CircleShape).border(2.dp,Color.Gray,CircleShape)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                TabInfo("Login", compte!!.login)
+                TabInfo("Mot de passe", "********")
+                TabInfo("Nom", compte!!.nom)
+                TabInfo("Prénom", compte!!.prenom)
+                TabInfo("Date de naissance", compte!!.dateNaissance)
+                TabInfo("Téléphone", compte!!.telephone)
+                TabInfo("Mail", compte!!.mail)
+                TabInfo("Intérêts", compte!!.interets)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
             Button(
                 onClick = { onSeDeconnecter() }
             ) {
@@ -405,5 +455,24 @@ fun Profil(pad: PaddingValues,user: Compte, onSeDeconnecter: () -> Unit){
         } else {
             Text(text = "Chargement des informations...", fontSize = 14.sp)
         }
+    }
+}
+
+fun FormatDate(input: String): String{
+    val caracteres = input.filter { it.isDigit() }
+    return when (caracteres.length) {
+        8 -> "${caracteres.take(2)}/${caracteres.substring(2,4)}/${caracteres.drop(4)}"
+        else -> caracteres
+    }
+}
+
+@Composable
+fun TabInfo(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(text = label, fontWeight = FontWeight.Bold)
+        Text(text = value)
     }
 }
